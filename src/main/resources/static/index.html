@@ -115,19 +115,24 @@
             font-weight: 700;
         }
 
-        input, button { font: inherit; }
+        input, textarea, button { font: inherit; }
 
-        input {
+        input, textarea {
             width: 100%;
-            height: 38px;
-            padding: 0 10px;
+            min-height: 38px;
+            padding: 8px 10px;
             border: 1px solid #bdc9bf;
             border-radius: 4px;
             color: var(--ink);
             background: #fff;
         }
 
-        input:focus-visible, button:focus-visible {
+        textarea {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        input:focus-visible, textarea:focus-visible, button:focus-visible {
             outline: 3px solid #e5a27f;
             outline-offset: 2px;
         }
@@ -149,8 +154,143 @@
             background: #fff;
         }
 
+        button.danger {
+            border-color: var(--error);
+            background: var(--error);
+        }
+
+        button.small {
+            min-height: 30px;
+            padding: 0 10px;
+            font-size: 12px;
+        }
+
         button:hover { filter: brightness(.94); }
         button:disabled { cursor: wait; opacity: .65; }
+
+        .panel {
+            margin-bottom: 28px;
+            padding: 18px;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, .72);
+        }
+
+        .panel-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .panel-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px 16px;
+        }
+
+        .field {
+            display: grid;
+            gap: 6px;
+        }
+
+        .field-wide {
+            grid-column: 1 / -1;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .iot-card {
+            display: grid;
+            gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--orange);
+            border-radius: 6px;
+            background: var(--paper);
+            animation: appear .24s ease-out both;
+        }
+
+        .iot-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .iot-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 0;
+        }
+
+        .iot-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 42px;
+            padding: 4px 8px;
+            border-radius: 999px;
+            color: var(--green);
+            background: var(--green-soft);
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .iot-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .iot-meta {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            background: var(--green-soft);
+        }
+
+        .iot-meta div {
+            display: grid;
+            gap: 4px;
+        }
+
+        .iot-meta span {
+            color: var(--muted);
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .iot-description {
+            margin: 0;
+            color: var(--ink);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .iot-json {
+            margin: 0;
+            padding: 10px 12px;
+            border: 1px solid var(--line);
+            border-radius: 4px;
+            background: #f8faf8;
+        }
 
         .list-heading {
             display: flex;
@@ -217,7 +357,9 @@
             font-weight: 800;
             text-transform: uppercase;
         }
-
+        #iots {
+            background: rgba(185, 149, 71, 0.7);
+        }
         pre {
             overflow: auto;
             margin: 0;
@@ -269,29 +411,73 @@
 <body>
     <header class="topbar">
         <div class="brand"><span class="brand-mark" aria-hidden="true">I</span> IoT / DATA</div>
-        <span class="topbar-label">Archivio letture</span>
+        <span class="topbar-label">Archivio dispositivi e letture</span>
     </header>
 
     <main>
         <p class="eyebrow">Registro dispositivi</p>
-        <h1>Record IoT</h1>
-        <p class="intro">Letture registrate dai dispositivi collegati.</p>
+        <h1>IoT & letture</h1>
+        <p class="intro">Elenco dei dispositivi con i relativi parametri e possibilità di aggiornare i record.</p>
 
-        <form class="toolbar" id="filter-form">
-            <div class="filter">
-                <label for="iot-id">Filtra per ID dispositivo</label>
-                <input id="iot-id" name="iotId" type="number" min="1" step="1" placeholder="Tutti i dispositivi">
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Dispositivi IoT</h2>
+                <div class="panel-actions">
+                    <button class="secondary" id="new-iot" type="button">Nuovo</button>
+                    <button id="refresh-iots" type="button">Aggiorna</button>
+                </div>
             </div>
-            <button type="submit">Filtra</button>
-            <button class="secondary" id="all-records" type="button">Mostra tutti</button>
-            <button class="secondary" id="refresh" type="button" aria-label="Aggiorna elenco">Aggiorna</button>
-        </form>
+            <ul id="iots" aria-live="polite" aria-busy="true"></ul>
+        </section>
 
-        <div class="list-heading">
-            <h2>Letture</h2>
-            <span id="summary" aria-live="polite">Caricamento...</span>
-        </div>
-        <ul id="records" aria-live="polite" aria-busy="true"></ul>
+        <section class="panel">
+            <div class="panel-header">
+                <h2 id="iot-form-title">Modifica dispositivo</h2>
+            </div>
+            <form id="iot-form">
+                <input type="hidden" id="iot-id-edit" />
+                <div class="form-grid">
+                    <div class="field">
+                        <label for="iot-name">Nome</label>
+                        <input id="iot-name" name="name" type="text" maxlength="45" required>
+                    </div>
+                    <div class="field">
+                        <label for="iot-macaddress">MAC Address</label>
+                        <input id="iot-macaddress" name="macaddress" type="text" maxlength="45" required>
+                    </div>
+                    <div class="field field-wide">
+                        <label for="iot-description">Descrizione</label>
+                        <input id="iot-description" name="description" type="text" maxlength="245">
+                    </div>
+                    <div class="field field-wide">
+                        <label for="iot-jsonrange">Json range</label>
+                        <textarea id="iot-jsonrange" name="jsonrange" rows="4" maxlength="512"></textarea>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" id="save-iot">Salva modifiche</button>
+                    <button type="button" class="secondary" id="cancel-edit">Annulla</button>
+                </div>
+            </form>
+        </section>
+
+        <section class="panel">
+            <form class="toolbar" id="filter-form">
+                <div class="filter">
+                    <label for="iot-id">Filtra per ID dispositivo</label>
+                    <input id="iot-id" name="iotId" type="number" min="1" step="1" placeholder="Tutti i dispositivi">
+                </div>
+                <button type="submit">Filtra</button>
+                <button class="secondary" id="all-records" type="button">Mostra tutti</button>
+                <button class="secondary" id="refresh" type="button" aria-label="Aggiorna elenco">Aggiorna</button>
+            </form>
+
+            <div class="list-heading">
+                <h2>Letture</h2>
+                <span id="summary" aria-live="polite">Caricamento...</span>
+            </div>
+            <ul id="records" aria-live="polite" aria-busy="true"></ul>
+        </section>
     </main>
 
     <script>
@@ -300,13 +486,168 @@
         const recordsList = document.querySelector('#records');
         const summary = document.querySelector('#summary');
         const refreshButton = document.querySelector('#refresh');
+        const iotList = document.querySelector('#iots');
+        const iotForm = document.querySelector('#iot-form');
+        const iotIdEdit = document.querySelector('#iot-id-edit');
+        const iotNameInput = document.querySelector('#iot-name');
+        const iotMacInput = document.querySelector('#iot-macaddress');
+        const iotDescriptionInput = document.querySelector('#iot-description');
+        const iotJsonRangeInput = document.querySelector('#iot-jsonrange');
+        const iotFormTitle = document.querySelector('#iot-form-title');
 
-        function showMessage(message, isError = false) {
+        function showMessage(listElement, message, isError = false) {
             const item = document.createElement('li');
             item.className = isError ? 'message error' : 'message';
             item.textContent = message;
-            recordsList.replaceChildren(item);
+            listElement.replaceChildren(item);
         }
+
+        function resetIotForm() {
+            iotForm.reset();
+            iotIdEdit.value = '';
+            iotFormTitle.textContent = 'Modifica dispositivo';
+            document.querySelector('#save-iot').textContent = 'Salva modifiche';
+        }
+
+        function renderIotCard(item) {
+            const card = document.createElement('li');
+            card.className = 'iot-card';
+
+            const head = document.createElement('div');
+            head.className = 'iot-header';
+            const title = document.createElement('div');
+            title.className = 'iot-title';
+            title.innerHTML = `<span class="iot-badge">#${item.id ?? '?'}</span><strong>${item.name ?? 'Senza nome'}</strong>`;
+            const actions = document.createElement('div');
+            actions.className = 'iot-actions';
+            const editButton = document.createElement('button');
+            editButton.type = 'button';
+            editButton.className = 'secondary small';
+            editButton.textContent = 'Modifica';
+            editButton.dataset.action = 'edit';
+            editButton.dataset.id = item.id;
+            const deleteButton = document.createElement('button');
+            deleteButton.type = 'button';
+            deleteButton.className = 'danger small';
+            deleteButton.textContent = 'Elimina';
+            deleteButton.dataset.action = 'delete';
+            deleteButton.dataset.id = item.id;
+            actions.append(editButton, deleteButton);
+            head.append(title, actions);
+
+            const meta = document.createElement('div');
+            meta.className = 'iot-meta';
+            meta.innerHTML = `
+                <div><span>MAC</span><strong>${item.macaddress ?? 'N/D'}</strong></div>
+                <div><span>Data rev.</span><strong>${item.daterev ? String(item.daterev).replace('T', ' ') : 'N/D'}</strong></div>
+            `;
+
+            const description = document.createElement('p');
+            description.className = 'iot-description';
+            description.textContent = item.description || 'Nessuna descrizione';
+            const jsonRange = document.createElement('pre');
+            jsonRange.className = 'iot-json';
+            jsonRange.textContent = item.jsonrange || 'Nessun json range';
+
+            card.append(head, meta, description, jsonRange);
+            return card;
+        }
+
+        async function loadIots() {
+            iotList.setAttribute('aria-busy', 'true');
+            try {
+                const response = await fetch('/api/iots', { headers: { Accept: 'application/json' } });
+                if (!response.ok) throw new Error(`Errore ${response.status}`);
+                const items = await response.json();
+                iotList.replaceChildren();
+                if (!Array.isArray(items) || items.length === 0) {
+                    showMessage(iotList, 'Nessun dispositivo trovato.');
+                    return;
+                }
+                items.forEach(item => iotList.append(renderIotCard(item)));
+            } catch (error) {
+                showMessage(iotList, `Impossibile caricare i dispositivi. ${error.message}`, true);
+            } finally {
+                iotList.setAttribute('aria-busy', 'false');
+            }
+        }
+
+        async function saveIot(event) {
+            event.preventDefault();
+            const id = iotIdEdit.value;
+            const payload = {
+                name: iotNameInput.value.trim(),
+                description: iotDescriptionInput.value.trim(),
+                macaddress: iotMacInput.value.trim(),
+                jsonrange: iotJsonRangeInput.value.trim()
+            };
+
+            if (!payload.name || !payload.macaddress) {
+                alert('Nome e MAC address sono obbligatori.');
+                return;
+            }
+
+            try {
+                const response = await fetch(id ? `/api/iots/${id}` : '/api/iots', {
+                    method: id ? 'PUT' : 'POST',
+                    headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    const message = await response.text();
+                    throw new Error(message || `Errore ${response.status}`);
+                }
+
+                resetIotForm();
+                await loadIots();
+            } catch (error) {
+                alert(`Salvataggio non riuscito: ${error.message}`);
+            }
+        }
+
+        iotForm.addEventListener('submit', saveIot);
+        document.querySelector('#new-iot').addEventListener('click', resetIotForm);
+        document.querySelector('#cancel-edit').addEventListener('click', resetIotForm);
+        document.querySelector('#refresh-iots').addEventListener('click', loadIots);
+
+        iotList.addEventListener('click', async (event) => {
+            const button = event.target.closest('button[data-action]');
+            if (!button) return;
+            const id = Number(button.dataset.id);
+            const action = button.dataset.action;
+
+            if (action === 'edit') {
+                try {
+                    const response = await fetch(`/api/iots/${id}`, { headers: { Accept: 'application/json' } });
+                    if (!response.ok) throw new Error(`Errore ${response.status}`);
+                    const item = await response.json();
+                    iotIdEdit.value = item.id;
+                    iotNameInput.value = item.name || '';
+                    iotMacInput.value = item.macaddress || '';
+                    iotDescriptionInput.value = item.description || '';
+                    iotJsonRangeInput.value = item.jsonrange || '';
+                    iotFormTitle.textContent = `Modifica dispositivo #${item.id}`;
+                    document.querySelector('#save-iot').textContent = 'Aggiorna';
+                    iotNameInput.focus();
+                } catch (error) {
+                    alert(`Impossibile leggere il dispositivo: ${error.message}`);
+                }
+                return;
+            }
+
+            if (action === 'delete') {
+                if (!window.confirm('Eliminare questo dispositivo?')) return;
+                try {
+                    const response = await fetch(`/api/iots/${id}`, { method: 'DELETE' });
+                    if (!response.ok) throw new Error(`Errore ${response.status}`);
+                    resetIotForm();
+                    await loadIots();
+                } catch (error) {
+                    alert(`Eliminazione non riuscita: ${error.message}`);
+                }
+            }
+        });
 
         function addRecord(record, index) {
             const item = document.createElement('li');
@@ -340,7 +681,7 @@
             recordsList.setAttribute('aria-busy', 'true');
             refreshButton.disabled = true;
             summary.textContent = 'Caricamento...';
-            showMessage('Recupero dei record in corso...');
+            showMessage(recordsList, 'Recupero dei record in corso...');
 
             const query = iotId ? `?iotId=${encodeURIComponent(iotId)}` : '';
             try {
@@ -360,13 +701,13 @@
 
                 recordsList.replaceChildren();
                 if (records.length === 0) {
-                    showMessage('Nessun record trovato.');
+                    showMessage(recordsList, 'Nessun record trovato.');
                 } else {
                     records.forEach(addRecord);
                 }
                 summary.textContent = `${records.length} ${records.length === 1 ? 'record' : 'record'}`;
             } catch (error) {
-                showMessage(`Impossibile caricare i record. ${error.message}`, true);
+                showMessage(recordsList, `Impossibile caricare i record. ${error.message}`, true);
                 summary.textContent = 'Errore';
             } finally {
                 recordsList.setAttribute('aria-busy', 'false');
@@ -385,6 +726,8 @@
         });
 
         refreshButton.addEventListener('click', () => loadRecords(iotIdInput.value.trim()));
+        resetIotForm();
+        loadIots();
         loadRecords();
     </script>
 </body>
