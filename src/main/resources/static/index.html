@@ -1,0 +1,391 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7f3">
+    <title>Archivio IoT</title>
+    <style>
+        :root {
+            color-scheme: light;
+            --ink: #202922;
+            --muted: #68756c;
+            --line: #dce3dc;
+            --paper: #ffffff;
+            --canvas: #f6f7f3;
+            --green: #235f49;
+            --green-soft: #e6f0e8;
+            --orange: #bd542e;
+            --error: #a43232;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            background:
+                linear-gradient(135deg, transparent 0 70%, rgba(220, 227, 220, .34) 70% 70.2%, transparent 70.2%),
+                var(--canvas);
+            font-family: "Segoe UI", "Trebuchet MS", sans-serif;
+        }
+
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 58px;
+            padding: 0 clamp(20px, 5vw, 72px);
+            color: #f7fbf7;
+            background: var(--green);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+            font-weight: 700;
+        }
+
+        .brand-mark {
+            display: grid;
+            width: 26px;
+            height: 26px;
+            place-items: center;
+            border: 1px solid rgba(255, 255, 255, .55);
+            border-radius: 50%;
+            color: #d5efc8;
+            font-size: 12px;
+        }
+
+        .topbar-label {
+            color: #d5e6da;
+            font-size: 12px;
+        }
+
+        main {
+            width: min(100% - 40px, 980px);
+            margin: 0 auto;
+            padding: clamp(38px, 7vh, 76px) 0 64px;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: clamp(30px, 5vw, 42px);
+            line-height: 1.1;
+        }
+
+        .intro {
+            margin: 12px 0 32px;
+            color: var(--muted);
+            font-size: 15px;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: end;
+            gap: 10px;
+            padding: 16px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            background: var(--paper);
+        }
+
+        .filter {
+            display: grid;
+            gap: 6px;
+            min-width: min(100%, 230px);
+            margin-right: auto;
+        }
+
+        label {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        input, button { font: inherit; }
+
+        input {
+            width: 100%;
+            height: 38px;
+            padding: 0 10px;
+            border: 1px solid #bdc9bf;
+            border-radius: 4px;
+            color: var(--ink);
+            background: #fff;
+        }
+
+        input:focus-visible, button:focus-visible {
+            outline: 3px solid #e5a27f;
+            outline-offset: 2px;
+        }
+
+        button {
+            min-height: 38px;
+            padding: 0 14px;
+            border: 1px solid var(--green);
+            border-radius: 4px;
+            color: #fff;
+            background: var(--green);
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        button.secondary {
+            color: var(--green);
+            background: #fff;
+        }
+
+        button:hover { filter: brightness(.94); }
+        button:disabled { cursor: wait; opacity: .65; }
+
+        .list-heading {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 16px;
+            margin: 30px 0 10px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 17px;
+        }
+
+        #summary {
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        ul {
+            display: grid;
+            gap: 8px;
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .record {
+            display: grid;
+            grid-template-columns: minmax(105px, .65fr) minmax(0, 2fr);
+            gap: 14px 24px;
+            padding: 17px 19px;
+            border: 1px solid var(--line);
+            border-left: 3px solid var(--green);
+            border-radius: 4px;
+            background: var(--paper);
+            animation: appear .24s ease-out both;
+        }
+
+        .record-meta {
+            display: grid;
+            align-content: start;
+            gap: 6px;
+        }
+
+        .record-id {
+            color: var(--green);
+            font-size: 14px;
+            font-weight: 800;
+        }
+
+        .record-date {
+            color: var(--muted);
+            font-size: 11px;
+            line-height: 1.5;
+        }
+
+        .record-body { min-width: 0; }
+
+        .iot-id {
+            margin: 0 0 8px;
+            color: var(--orange);
+            font-size: 11px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        pre {
+            overflow: auto;
+            margin: 0;
+            color: #34433a;
+            font-family: Consolas, "Courier New", monospace;
+            font-size: 12px;
+            line-height: 1.55;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+        }
+
+        .message {
+            padding: 24px 18px;
+            border: 1px dashed #bdc9bf;
+            border-radius: 4px;
+            color: var(--muted);
+            background: rgba(255, 255, 255, .7);
+            font-size: 14px;
+        }
+
+        .message.error { color: var(--error); }
+
+        @keyframes appear {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 580px) {
+            .topbar { min-height: 52px; }
+            .topbar-label { font-size: 11px; }
+            main { width: min(100% - 28px, 980px); }
+            .toolbar { align-items: stretch; }
+            .filter { width: 100%; }
+            .toolbar button { flex: 1; }
+            .record { grid-template-columns: 1fr; gap: 12px; }
+            .record-meta { grid-template-columns: auto 1fr; align-items: center; }
+            .record-date { text-align: right; }
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">I</span> IoT / DATA</div>
+        <span class="topbar-label">Archivio letture</span>
+    </header>
+
+    <main>
+        <p class="eyebrow">Registro dispositivi</p>
+        <h1>Record IoT</h1>
+        <p class="intro">Letture registrate dai dispositivi collegati.</p>
+
+        <form class="toolbar" id="filter-form">
+            <div class="filter">
+                <label for="iot-id">Filtra per ID dispositivo</label>
+                <input id="iot-id" name="iotId" type="number" min="1" step="1" placeholder="Tutti i dispositivi">
+            </div>
+            <button type="submit">Filtra</button>
+            <button class="secondary" id="all-records" type="button">Mostra tutti</button>
+            <button class="secondary" id="refresh" type="button" aria-label="Aggiorna elenco">Aggiorna</button>
+        </form>
+
+        <div class="list-heading">
+            <h2>Letture</h2>
+            <span id="summary" aria-live="polite">Caricamento...</span>
+        </div>
+        <ul id="records" aria-live="polite" aria-busy="true"></ul>
+    </main>
+
+    <script>
+        const form = document.querySelector('#filter-form');
+        const iotIdInput = document.querySelector('#iot-id');
+        const recordsList = document.querySelector('#records');
+        const summary = document.querySelector('#summary');
+        const refreshButton = document.querySelector('#refresh');
+
+        function showMessage(message, isError = false) {
+            const item = document.createElement('li');
+            item.className = isError ? 'message error' : 'message';
+            item.textContent = message;
+            recordsList.replaceChildren(item);
+        }
+
+        function addRecord(record, index) {
+            const item = document.createElement('li');
+            item.className = 'record';
+            item.style.animationDelay = `${Math.min(index * 25, 250)}ms`;
+
+            const meta = document.createElement('div');
+            meta.className = 'record-meta';
+            const recordId = document.createElement('span');
+            recordId.className = 'record-id';
+            recordId.textContent = `#${record.id ?? '?'}`;
+            const date = document.createElement('time');
+            date.className = 'record-date';
+            date.textContent = record.datetime ? String(record.datetime).replace('T', ' ') : 'Data non disponibile';
+            meta.append(recordId, date);
+
+            const body = document.createElement('div');
+            body.className = 'record-body';
+            const iotId = document.createElement('p');
+            iotId.className = 'iot-id';
+            iotId.textContent = `Dispositivo ${record.idIot ?? '?'}`;
+            const data = document.createElement('pre');
+            data.textContent = record.jsondata ?? 'Nessun dato';
+            body.append(iotId, data);
+
+            item.append(meta, body);
+            recordsList.append(item);
+        }
+
+        async function loadRecords(iotId = '') {
+            recordsList.setAttribute('aria-busy', 'true');
+            refreshButton.disabled = true;
+            summary.textContent = 'Caricamento...';
+            showMessage('Recupero dei record in corso...');
+
+            const query = iotId ? `?iotId=${encodeURIComponent(iotId)}` : '';
+            try {
+                const response = await fetch(`/api/data${query}`, {
+                    headers: { Accept: 'application/json' }
+                });
+                if (!response.ok) {
+                    throw new Error(response.status === 404
+                        ? 'Dispositivo non trovato.'
+                        : `Risposta del server: ${response.status}`);
+                }
+
+                const records = await response.json();
+                if (!Array.isArray(records)) {
+                    throw new Error('La risposta del server non contiene un elenco di record.');
+                }
+
+                recordsList.replaceChildren();
+                if (records.length === 0) {
+                    showMessage('Nessun record trovato.');
+                } else {
+                    records.forEach(addRecord);
+                }
+                summary.textContent = `${records.length} ${records.length === 1 ? 'record' : 'record'}`;
+            } catch (error) {
+                showMessage(`Impossibile caricare i record. ${error.message}`, true);
+                summary.textContent = 'Errore';
+            } finally {
+                recordsList.setAttribute('aria-busy', 'false');
+                refreshButton.disabled = false;
+            }
+        }
+
+        form.addEventListener('submit', (event) => {
+            event.preventDefault();
+            loadRecords(iotIdInput.value.trim());
+        });
+
+        document.querySelector('#all-records').addEventListener('click', () => {
+            iotIdInput.value = '';
+            loadRecords();
+        });
+
+        refreshButton.addEventListener('click', () => loadRecords(iotIdInput.value.trim()));
+        loadRecords();
+    </script>
+</body>
+</html>
