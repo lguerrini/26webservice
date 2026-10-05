@@ -347,6 +347,7 @@ window.authReady.then((user) => {
   document.querySelector("#new-iot").hidden = !isAdmin;
   document.querySelector("#manage-users").hidden = !isAdmin;
   document.querySelector("#iot-edit-panel").hidden = !isAdmin;
+  document.querySelector("#iot-form-panel").hidden = !isAdmin;
   resetIotForm();
   loadIots();
   loadRecords();
