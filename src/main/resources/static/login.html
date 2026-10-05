@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="it">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7f3">
+    <title>Accesso IoT</title>
+    <link rel="stylesheet" href="/css/login.css">
+</head>
+<body>
+    <header class="topbar">
+        <div class="brand"><span class="brand-mark" aria-hidden="true">I</span> IoT / DATA</div>
+    </header>
+
+    <main>
+        <section class="auth-panel" aria-labelledby="title">
+            <p class="eyebrow">Area dispositivi</p>
+            <h1 id="title">Accedi</h1>
+            <p class="intro">Entra per consultare i dispositivi e le letture registrate.</p>
+
+            <div class="tabs" role="tablist" aria-label="Accesso o registrazione">
+                <button class="tab" id="login-tab" type="button" role="tab" aria-selected="true">Accedi</button>
+                <button class="tab" id="register-tab" type="button" role="tab" aria-selected="false">Registrati</button>
+            </div>
+
+            <form id="login-form">
+                <div class="field">
+                    <label for="login-username">Username</label>
+                    <input id="login-username" name="username" type="text" maxlength="45" autocomplete="username" required>
+                </div>
+                <div class="field">
+                    <label for="login-password">Password</label>
+                    <input id="login-password" name="password" type="password" maxlength="72" autocomplete="current-password" required>
+                </div>
+                <button class="submit" type="submit">Accedi</button>
+            </form>
+
+            <form id="register-form" hidden>
+                <div class="fields">
+                    <div class="field">
+                        <label for="firstname">Nome</label>
+                        <input id="firstname" name="firstname" type="text" maxlength="45" autocomplete="given-name" required>
+                    </div>
+                    <div class="field">
+                        <label for="lastname">Cognome</label>
+                        <input id="lastname" name="lastname" type="text" maxlength="45" autocomplete="family-name" required>
+                    </div>
+                    <div class="field field-wide">
+                        <label for="register-username">Username</label>
+                        <input id="register-username" name="username" type="text" maxlength="45" autocomplete="username" required>
+                    </div>
+                    <div class="field field-wide">
+                        <label for="email">Email (facoltativa)</label>
+                        <input id="email" name="email" type="email" maxlength="45" autocomplete="email">
+                    </div>
+                    <div class="field field-wide">
+                        <label for="register-password">Password (almeno 8 caratteri)</label>
+                        <input id="register-password" name="password" type="password" minlength="8" maxlength="72" autocomplete="new-password" required>
+                    </div>
+                </div>
+                <button class="submit" type="submit">Crea account</button>
+            </form>
+
+            <p class="message" id="message" role="status" aria-live="polite"></p>
+        </section>
+    </main>
+
+    <script src="/js/login.js" defer></script>
+</body>
+</html>

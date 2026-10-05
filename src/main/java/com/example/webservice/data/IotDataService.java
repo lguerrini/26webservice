@@ -3,12 +3,18 @@ package com.example.webservice.data;
 import java.util.List;
 
 import com.example.webservice.iot.ItemRepository;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class IotDataService {
+    private static final Pageable LATEST_DATA = PageRequest.of(
+            0, 100, Sort.by(Sort.Direction.DESC, "id"));
+
     private final IotDataRepository repository;
     private final ItemRepository iotRepository;
 
@@ -19,10 +25,10 @@ public class IotDataService {
 
     public List<IotData> findAll(Integer iotId) {
         if (iotId == null) {
-            return repository.findAll();
+            return repository.findAll(LATEST_DATA).getContent();
         }
         requireExistingIot(iotId);
-        return repository.findAllByIdIot(iotId);
+        return repository.findAllByIdIot(iotId, LATEST_DATA).getContent();
     }
 
     public IotData findById(Integer id) {

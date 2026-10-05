@@ -1,9 +1,9 @@
 package com.example.webservice.data;
 
-import java.util.List;
-
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 public interface IotDataRepository extends JpaRepository<IotData, Integer> {
-    List<IotData> findAllByIdIot(Integer idIot);
+    Page<IotData> findAllByIdIot(Integer idIot, Pageable pageable);
 }
