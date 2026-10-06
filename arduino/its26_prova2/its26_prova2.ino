@@ -2,6 +2,7 @@
 #include <WiFi.h>
 #include <HTTPClient.h>
 #include <ArduinoJson.h>
+#include <stdio.h>
 #include <Wire.h>
 #include "Grove_Temperature_And_Humidity_Sensor.h"
 #include <UltrasonicSensorLibrary.h>
@@ -9,6 +10,8 @@
 const char *ssid = "retehp";
 const char *password = "a1b2c3d4";
 const char *serverAddress = "http://192.168.137.1:8081";
+const int ipkey = 50;
+const char deviceApiKey[] = "z02Zs1A_d_vasNTOEFwLPtSqPP8fnvxMpvSwil_Yc00";
 
 JsonDocument iot;
 /*
@@ -23,14 +26,14 @@ float max2 = 50;
 */
 const int ledPin = 1;
 int sec = 0;
-const int ultraSig = 12; // pin digitale radar1
+const int ultraSig = 12;  // pin digitale radar1
 Ultrasonic sensor1(ultraSig);
 int alarm1 = 0;
 float val1 = 0;
 float min1 = 20;
 float max1 = 50;
 
-const int ultraSig2 = 10; // pin digitale radar2
+const int ultraSig2 = 10;  // pin digitale radar2
 Ultrasonic sensor2(ultraSig2);
 int alarm2 = 0;
 float val2 = 0;
@@ -80,7 +83,7 @@ void loop() {
   checkSensor1();
   checkSensor2();
   showStatus();
-  if (sec %10 ==0) postData();
+  if (sec % 10 == 0) postData();
 }
 
 bool connessioneWIFI() {
@@ -184,6 +187,7 @@ void getIot() {
   Serial.println(requestUrl);
 
   http.begin(requestUrl);
+  http.addHeader("X-Device-Key", deviceApiKey);
   int httpResponseCode = http.GET();
 
   if (httpResponseCode == HTTP_CODE_OK) {
@@ -239,6 +243,7 @@ void postData() {
   HTTPClient http;
   http.begin(requestUrl);
   http.addHeader("Content-Type", "application/json");
+  http.addHeader("X-Device-Key", deviceApiKey);
 
   Serial.print("POST ");
   Serial.println(requestUrl);
@@ -262,8 +267,8 @@ void postData() {
 }
 
 // Funzione che accetta i valori e restituisce un char* contenente il JSON
-char* creaJsonData() {
-  
+char *creaJsonData() {
+
   // 1. Alloca un JsonDocument della dimensione adeguata.
   // Per un JSON così piccolo, 256 byte sono più che sufficienti e sicuri.
   JsonDocument doc;
@@ -282,7 +287,7 @@ char* creaJsonData() {
   obj2["alarm"] = alarm2;
 
   // 3. Dichiariamo un array di char statico o globale per contenere la stringa risultante.
-  // IMPORTANTE: static o globale significa che la memoria non viene distrutta 
+  // IMPORTANTE: static o globale significa che la memoria non viene distrutta
   // quando la funzione termina, permettendo al puntatore char* di rimanere valido!
   static char jsonBuffer[256];
 
